@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Dot Trick Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #emailOutput {
+            margin-top: 20px;
+            font-size: 1.5em;
+            color: green;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gmail Dot Trick Generator</h1>
+    <button id="generateButton">Generate New Email</button>
+    <div id="emailOutput">Click the button to generate a new email.</div>
+
+    <script>
+        // Function to fetch a new email from the backend
+        async function generateNewEmail() {
+            try {
+                const response = await fetch('https://your-service-name.onrender.com/generate-email'); // Replace with your Render URL
+                const data = await response.json();
+
+                if (data.error) {
+                    document.getElementById('emailOutput').innerText = data.error;
+                } else {
+                    document.getElementById('emailOutput').innerText = `Generated Email: ${data.email}`;
+                }
+            } catch (error) {
+                document.getElementById('emailOutput').innerText = 'Error fetching email. Please try again.';
+            }
+        }
+
+        // Attach the button click event
+        document.getElementById('generateButton').addEventListener('click', generateNewEmail);
+    </script>
+</body>
+</html>
