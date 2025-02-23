@@ -5,47 +5,138 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gmail Dot Trick Generator</title>
     <style>
+        /* General Styles */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text */
+        }
+
+        h1 {
+            font-size: 2.5em;
             margin-top: 50px;
         }
+
+        /* Button Styles */
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 1em;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .button.generate {
+            background-color: #555; /* Grey button */
+            color: #fff;
+        }
+
+        .button.generate:hover {
+            background-color: #777; /* Slightly lighter grey on hover */
+        }
+
+        .button.copy {
+            background-color: #333; /* Dark grey button */
+            color: #fff;
+        }
+
+        .button.copy:hover {
+            background-color: #555; /* Slightly lighter dark grey on hover */
+        }
+
+        /* Output Area */
         #emailOutput {
             margin-top: 20px;
             font-size: 1.5em;
-            color: green;
+            color: #ccc; /* Light grey text for output */
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
-        button {
-            padding: 10px 20px;
-            font-size: 1em;
-            cursor: pointer;
+
+        #emailOutput.show {
+            opacity: 1;
+        }
+
+        /* Loading Spinner */
+        #loading {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #ff9800; /* Orange spinner */
+            display: none;
         }
     </style>
 </head>
 <body>
     <h1>Gmail Dot Trick Generator</h1>
-    <button id="generateButton">Generate New Email</button>
-    <div id="emailOutput">Click the button to generate a new email.</div>
+
+    <!-- Generate New Email Button -->
+    <button id="generateButton" class="button generate">Generate New Email</button>
+
+    <!-- Copy to Clipboard Button -->
+    <button id="copyButton" class="button copy" disabled>Copy to Clipboard</button>
+
+    <!-- Email Output -->
+    <div id="emailOutput">Click "Generate New Email" to get started.</div>
+
+    <!-- Loading Indicator -->
+    <div id="loading">Generating...</div>
 
     <script>
         // Function to fetch a new email from the backend
         async function generateNewEmail() {
             try {
-                const response = await fetch('https://your-service-name.onrender.com/generate-email'); // Replace with your Render URL
+                // Show loading indicator
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('emailOutput').innerText = '';
+                document.getElementById('emailOutput').classList.remove('show');
+
+                // Fetch new email
+                const response = await fetch('/generate-email');
                 const data = await response.json();
+
+                // Hide loading indicator
+                document.getElementById('loading').style.display = 'none';
 
                 if (data.error) {
                     document.getElementById('emailOutput').innerText = data.error;
                 } else {
-                    document.getElementById('emailOutput').innerText = `Generated Email: ${data.email}`;
+                    const newEmail = data.email;
+                    document.getElementById('emailOutput').innerText = `Generated Email: ${newEmail}`;
+                    document.getElementById('emailOutput').classList.add('show');
+
+                    // Enable the "Copy to Clipboard" button
+                    document.getElementById('copyButton').disabled = false;
+
+                    // Store the email in a global variable for copying
+                    window.generatedEmail = newEmail;
                 }
             } catch (error) {
+                document.getElementById('loading').style.display = 'none';
                 document.getElementById('emailOutput').innerText = 'Error fetching email. Please try again.';
             }
         }
 
-        // Attach the button click event
+        // Function to copy the generated email to clipboard
+        function copyToClipboard() {
+            if (window.generatedEmail) {
+                navigator.clipboard.writeText(window.generatedEmail).then(() => {
+                    alert(`Copied to clipboard: ${window.generatedEmail}`);
+                }).catch(err => {
+                    console.error('Failed to copy email:', err);
+                    alert('Failed to copy email. Please try again.');
+                });
+            }
+        }
+
+        // Attach event listeners
         document.getElementById('generateButton').addEventListener('click', generateNewEmail);
+        document.getElementById('copyButton').addEventListener('click', copyToClipboard);
     </script>
 </body>
 </html>
