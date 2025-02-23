@@ -6,8 +6,8 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB
-mongoose.connect('mongodb+srv://ayush:ayush1234@gmaildotgen.rvadr.mongodb.net/?retryWrites=true&w=majority&appName=GmailDotGen', {
+// Connect to MongoDB using environment variable
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => console.log('Connected to MongoDB'))
